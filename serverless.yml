@@ -1,0 +1,35 @@
+service: ## service name
+
+plugins:
+    - serverless-webpack
+
+custom:
+    webpackIncludeModules: true
+    memorySize:
+        dev: 1024
+        staging: 1024
+        production: 2048
+    timeout:
+        dev: 6
+        staging: 6
+        production: 12
+
+provider:
+    name: aws
+    runtime: nodejs8.10
+    profile: ## profile
+    stage: ${opt:stage, 'dev'}
+    environment:
+        ENV: ${opt:stage}
+    region: ap-southeast-2
+
+functions:
+    hello:
+        handler: src/handler.hello
+        memorySize: ${self:custom.memorySize.${opt:stage}}
+        timeout: ${self:custom.timeout.${opt:stage}}
+        events:
+        - http:
+            path: hello
+            method: get
+            cors: true
